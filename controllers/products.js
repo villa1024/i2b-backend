@@ -1,5 +1,33 @@
+const { Op } = require("sequelize");
+
 const Order = require("../models/Order");
 const Product = require("../models/Product");
+
+const getProductById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = (await Product.findOne({
+            where: {
+                id
+            },
+            include: Order
+        }));
+        if(!product) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Producto no encontrado...'
+            });
+        }
+        return res.json({
+            ok: true,
+            product
+        });
+    } catch (error) {
+        return res.status(500).json({
+            msg: error.message
+        });
+    }
+};
 
 const getAll = async (req, res) => {
     try {
@@ -19,13 +47,9 @@ const getAll = async (req, res) => {
 
 const getAllOrders = async (req, res) => {
     try {
-        const orders = await Order.findAll({
-            attributes: ['id', 'date'],
-            include: [{
-                model: Product,
-                attributes: ['id', 'name', 'price', 'description']
-            }]
-        });
+        const orders = (await Product.findAll({
+            include: Order
+        })).filter(({ orders }) => orders.length > 0);
         return res.json({
             ok: true,
             orders
@@ -122,6 +146,7 @@ const createProduct = async (req, res) => {
 };
 
 module.exports = {
+    getProductById,
     getAll,
     getAllOrders,
     editProduct,
