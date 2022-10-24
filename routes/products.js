@@ -6,7 +6,7 @@ const { getProductById, getAll, getAllOrders, editProduct, newOrder, deleteOrder
 router.get('/getProductById/:id', getProductById);
 router.get('/getAll', getAll);
 router.get('/getAllOrders', getAllOrders);
-router.put('/editProduct/:id', editProduct);
+router.put('/editProduct', editProduct);
 router.post('/newOrder', newOrder);
 router.delete('/deleteOrder/:order_id', deleteOrder);
 

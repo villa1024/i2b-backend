@@ -63,8 +63,7 @@ const getAllOrders = async (req, res) => {
 
 const editProduct = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { name, price, description } = req.body;
+        const { id, name, price, description } = req.body;
 
         const product = await Product.findByPk(id);
         if (!product) {
