@@ -12,7 +12,7 @@ const getProductById = async (req, res) => {
             },
             include: Order
         }));
-        if(!product) {
+        if (!product) {
             return res.status(404).json({
                 ok: false,
                 msg: 'Producto no encontrado...'
@@ -31,11 +31,18 @@ const getProductById = async (req, res) => {
 
 const getAll = async (req, res) => {
     try {
-        const products = await Product.findAll({
-            attributes: ['id', 'name', 'price', 'description']
+        const { page } = req.query;
+        const products = await Product.findAndCountAll({
+            attributes: ['id', 'name', 'price', 'description'],
+            limit: 5,
+            offset: page * 5,
+            order: [
+                ['id', 'ASC']
+            ]
         });
         return res.json({
             ok: true,
+            totalPages: Math.ceil(products.count / 5),
             products
         });
     } catch (error) {
@@ -47,12 +54,19 @@ const getAll = async (req, res) => {
 
 const getAllOrders = async (req, res) => {
     try {
-        const orders = (await Product.findAll({
-            include: Order
-        })).filter(({ orders }) => orders.length > 0);
+        const { page } = req.query;
+        const orders = await Order.findAndCountAll({
+            include: Product,
+            limit: 5,
+            offset: page * 5,
+            order: [
+                ['id', 'ASC']
+            ]
+        });
         return res.json({
             ok: true,
-            orders
+            totalPages: Math.ceil(orders.count / 5),
+            orders: orders.rows
         });
     } catch (error) {
         return res.status(500).json({
